@@ -5,6 +5,7 @@ import (
 	"fitbot/internal/fitforfree"
 	"fitbot/internal/fitforfree/lesson"
 	"fitbot/internal/fitforfree/login"
+	"fitbot/internal/fitforfree/scheduled_classes"
 	"fitbot/internal/fitforfree/utils"
 	"fmt"
 	"strconv"
@@ -29,7 +30,8 @@ var (
 		FitPostcode string `env:"FIT_POSTCODE,required"`
 		FitVenue    string `env:"FIT_VENUE,required"`
 	}
-	lessionAPI lesson.API
+	lessionAPI          lesson.API
+	scheduledClassesAPI scheduled_classes.API
 )
 
 func reply(message *telegram.Message, text string) error {
@@ -90,18 +92,19 @@ func book(message *telegram.Message, params []string) error {
 			time.Sleep(time.Duration(funk.RandomInt(3*1000, 4*1000)) * time.Millisecond)
 
 			log.Debug("listing")
-			res, err := lessionAPI.List(lesson.ListParams{
-				Venue: config.FitVenue,
-				From:  utils.From(day),
-				To:    utils.To(day),
+			res, err := scheduledClassesAPI.List(scheduled_classes.ListQuery{
+				Category:           "free_practise",
+				Date:               utils.Date(day),
+				ExcludeFullyBooked: true,
+				Venues:             config.FitVenue,
 			})
 			if err != nil {
-				return false, fmt.Errorf("failed to list lessons: %+v", err)
+				return false, fmt.Errorf("failed to list scheduled classes: %+v", err)
 			}
 
 		nextLesson:
-			for _, cur := range res.Data.Lessons {
-				if cur.Activity.ID != "vrijefitness" || cur.ClassType != "free_practise" {
+			for _, cur := range res.ScheduledClasses {
+				if cur.ClassType != "free_practise" || cur.Activity.ID != "vrijtrainen" {
 					continue nextLesson
 				}
 
@@ -221,6 +224,7 @@ func main() {
 	API := *fitforfree.New()
 	lessionAPI = lesson.API{API: API}
 	loginAPI := login.API{API: API}
+	scheduledClassesAPI = scheduled_classes.API{API: API}
 
 	var err error
 	LoginResult, err := loginAPI.Login(login.LoginData{

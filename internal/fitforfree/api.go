@@ -23,7 +23,7 @@ func New() *API {
 	return &API{
 		baseURL: "https://electrolyte.fitforfree.nl",
 		headers: map[string]string{
-			"App-Version": "4.4.7",
+			"App-Version": "4.6.3",
 			"User-Agent":  "okhttp/4.2.0",
 		},
 	}
