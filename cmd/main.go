@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fitbot/internal/fitforfree"
 	"fitbot/internal/fitforfree/lesson"
+	"fitbot/internal/fitforfree/login"
 	"fitbot/internal/fitforfree/utils"
 	"fmt"
 	"strconv"
@@ -21,11 +22,12 @@ import (
 var (
 	botAPI *telegram.BotAPI
 	config struct {
-		Debug    bool   `env:"DEBUG"`
-		BotOwner int    `env:"BOT_OWNER,required"`
-		BotToken string `env:"BOT_TOKEN,required"`
-		FitToken string `env:"FIT_TOKEN,required"`
-		FitVenue string `env:"FIT_VENUE,required"`
+		Debug       bool   `env:"DEBUG"`
+		BotOwner    int    `env:"BOT_OWNER,required"`
+		BotToken    string `env:"BOT_TOKEN,required"`
+		FitMemberID string `env:"FIT_MEMBER_ID,required"`
+		FitPostcode string `env:"FIT_POSTCODE,required"`
+		FitVenue    string `env:"FIT_VENUE,required"`
 	}
 	lessionAPI lesson.API
 )
@@ -216,11 +218,22 @@ func main() {
 		log.SetLevel(log.DebugLevel)
 	}
 
-	lessionAPI = lesson.API{API: *fitforfree.New(fitforfree.Options{
-		Token: config.FitToken,
-	})}
+	API := *fitforfree.New()
+	lessionAPI = lesson.API{API: API}
+	loginAPI := login.API{API: API}
 
 	var err error
+	LoginResult, err := loginAPI.Login(login.LoginData{
+		MemberID:      config.FitMemberID,
+		Postcode:      config.FitPostcode,
+		TermsAccepted: true,
+	})
+	if err != nil {
+		log.WithError(err).Fatal("failed to login")
+	}
+	API.SetAuth(LoginResult.Data.SessionID)
+	log.Infof("logged in as %s %s", LoginResult.Data.FirstName, LoginResult.Data.Surname)
+
 	botAPI, err = telegram.NewBotAPI(config.BotToken)
 	if err != nil {
 		log.WithError(err).Fatal("failed to create bot")

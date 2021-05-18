@@ -12,11 +12,6 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-// Options contains the options
-type Options struct {
-	Token string
-}
-
 // API contains the internal state
 type API struct {
 	baseURL string
@@ -24,15 +19,18 @@ type API struct {
 }
 
 // New initializes a new API instance
-func New(opts Options) *API {
+func New() *API {
 	return &API{
 		baseURL: "https://electrolyte.fitforfree.nl",
 		headers: map[string]string{
-			"App-Version":   "4.4.7",
-			"Authorization": fmt.Sprintf("Bearer %s", opts.Token),
-			"User-Agent":    "okhttp/4.2.0",
+			"App-Version": "4.4.7",
+			"User-Agent":  "okhttp/4.2.0",
 		},
 	}
+}
+
+func (api *API) SetAuth(sessionID string) {
+	api.headers["Authorization"] = fmt.Sprintf("Bearer %s", sessionID)
 }
 
 // Request makes an API request
