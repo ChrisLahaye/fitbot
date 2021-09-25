@@ -2,11 +2,11 @@ package main
 
 import (
 	"errors"
-	"fitbot/internal/fitforfree"
-	"fitbot/internal/fitforfree/lesson"
-	"fitbot/internal/fitforfree/login"
-	"fitbot/internal/fitforfree/scheduled_classes"
-	"fitbot/internal/fitforfree/utils"
+	"github.com/ChrisLahaye/fitbot/internal/fitforfree"
+	"github.com/ChrisLahaye/fitbot/internal/fitforfree/lesson"
+	"github.com/ChrisLahaye/fitbot/internal/fitforfree/login"
+	"github.com/ChrisLahaye/fitbot/internal/fitforfree/scheduled_classes"
+	"github.com/ChrisLahaye/fitbot/internal/fitforfree/utils"
 	"fmt"
 	"strconv"
 	"strings"

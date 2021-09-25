@@ -1,7 +1,7 @@
 package scheduled_classes
 
 import (
-	"fitbot/internal/fitforfree"
+	"github.com/ChrisLahaye/fitbot/internal/fitforfree"
 	"fmt"
 	"strings"
 	"time"

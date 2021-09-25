@@ -1,4 +1,4 @@
-module fitbot
+module github.com/ChrisLahaye/fitbot
 
 go 1.15
 
